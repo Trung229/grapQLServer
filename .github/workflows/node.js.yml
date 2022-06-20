@@ -1,0 +1,31 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI # tên của action build
+
+on: # xảy ra sự kiện để kích hoạt build
+  push:
+    branches: [ "main" ] # khi code được push lên branch master
+  pull_request:
+    branches: [ "main" ] # khi có pull request ở branch master
+
+jobs: # những công việc mà nó sẽ làm khi nhận được event
+  build:
+
+    runs-on: ubuntu-latest # build môi trường
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3 # sử dụng code của mình
+    - name: Use Node.js ${{ matrix.node-version }} # tên của step
+      uses: actions/setup-node@v3 # set up nodejs
+      with:
+        node-version: ${{ matrix.node-version }} #lựa chọn phiên bản cho node
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
